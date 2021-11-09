@@ -22,50 +22,15 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.5.1/math.js"></script>
         <script src="https://unpkg.com/gauss-jordan@1.2.2/dist/gauss-jordan.min.js"></script>
         <script src="https://docs.opencv.org/4.5.4/opencv.js"></script>
+        <div>
+            <img id='input_img'>
+            <input type="file" id="file_input" name="file">
+        </div>
+        <div class="output">
+            <canvas id='output'></canvas>
+        </div>
+        <script src="https://unpkg.com/gpu.js@latest/dist/gpu-browser.min.js"></script>
         <script src="svdoptimized.js"></script>
-
-        <img id='input_img'>
-        <input type="file" id="file_input">
-        <canvas id='output'></canvas>
-
-        <script>
-        let img_input = document.getElementById('input_img');
-        let file_input = document.getElementById('file_input');
-
-        file_input.addEventListener('change', (e) => {
-            img_input.src = URL.createObjectURL(e.target.files[0])
-        },false);
-
-        // PROSES KOMPRESI GAMBAR
-        img_input.onload= function(){
-            let src = cv.imread(img_input);
-            let dst = new cv.Mat();
-            let rgbaPlanes = new cv.MatVector();
-            let mergedPlanes = new cv.MatVector();
-
-            // Split jadi R, G, B channels
-            cv.split(src, rgbaPlanes);
-            let R = rgbaPlanes.get(0);
-            let G = rgbaPlanes.get(1);
-            let B = rgbaPlanes.get(2);
-
-            // Compress R, G, B channels
-            let R1 = compress(R);
-            let G1 = compress(G);
-            let B1 = compress(B);
-
-            // Merge R, G, B channels
-            mergedPlanes.push_back(R1);
-            mergedPlanes.push_back(G1);
-            mergedPlanes.push_back(B1);
-
-            cv.merge(mergedPlanes, dst);
-
-
-            cv.imshow('output', dst);
-            src.delete(); rgbaPlanes.delete(); dst.delete(); mergedPlanes.delete();
-        }
-
-        </script>
+        <script src="process.js"></script>
     </body>
 </html>
