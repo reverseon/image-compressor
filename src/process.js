@@ -44,7 +44,7 @@ function compressChannel(channelArr, percent) {
     if (percent < 1 || percent > 100) {
         throw new Error('Percent must be between 1 and 100');
     }
-    let {u, v, q} = svdoptimized(channelArr, 'f');
+    let {u, v, q} = svdgolub(channelArr);
     let modifiedQ = [];
     let cols = channelArr[0].length;
     let rows = channelArr.length;
