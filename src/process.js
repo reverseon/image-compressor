@@ -41,11 +41,19 @@ function matToArr(mat) {
 }
 
 function compressChannel(channelArr, percent) {
-
+    if (percent < 1 || percent > 100) {
+        throw new Error('Percent must be between 1 and 100');
+    }
     let {u, v, q} = svdoptimized(channelArr, 'f');
     let modifiedQ = [];
     let cols = channelArr[0].length;
-    let level = Math.round(cols * percent / 100);
+    let rows = channelArr.length;
+    let level = 0;
+    if (cols > rows) {
+        level = Math.round(rows * percent / 100);
+    } else {
+        level = Math.round(cols * percent / 100);
+    }
     for (let i = 0; i < level; i++) {
         let rowNow = [];
         for (let j = 0; j < level; j++) {
@@ -97,7 +105,7 @@ img_input.onload = function() {
     let zeroMat = arrToMat(zeroArr);
     cv.split(src, rgbaSrc);
     for (let i = 0; i < 3; i++) {
-        rgbaDst.push_back(arrToMat(compressChannel(matToArr(rgbaSrc.get(i)), 30)));
+        rgbaDst.push_back(arrToMat(compressChannel(matToArr(rgbaSrc.get(i)), 100)));
         //console.log(matToArr(rgbaSrc.get(i)));
         //console.log(matToArr(rgbaDst.get(i)));
         // rgbaDst.push_back(rgbaSrc.get(i));
