@@ -98,7 +98,8 @@ img_input.onload = function() {
     cv.split(src, rgbaSrc);
     for (let i = 0; i < 3; i++) {
         rgbaDst.push_back(arrToMat(compressChannel(matToArr(rgbaSrc.get(i)), 30)));
-        console.log(matToArr(rgbaDst.get(i)));
+        //console.log(matToArr(rgbaSrc.get(i)));
+        //console.log(matToArr(rgbaDst.get(i)));
         // rgbaDst.push_back(rgbaSrc.get(i));
     }
     // console.log(rgbaSrc.get(0));

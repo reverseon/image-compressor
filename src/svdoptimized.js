@@ -14,7 +14,7 @@ function svdoptimized(m1) {
     // Melakukan transpose jika n > m
     if(n > m){
         istransposed = true;
-        m1 = matrixtranspose(m1);
+        m1 = math.transpose(math.matrix(m1))._data;
         m = m1.length;
         n = m1[0].length;
     }
@@ -148,7 +148,7 @@ function svdoptimized(m1) {
     }
 
     if(istransposed){   // Membalikkan u dan v jika n > m
-        return {u: matrixtranspose(VT), q: S, v: matrixtranspose(U)};
+        return {u: VT, q: S, v: U};
     } else{
         return {u: U, q: S, v: VT};
     }
