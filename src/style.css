@@ -1,0 +1,17 @@
+.card-body {
+    width: 100%;
+    display: inline-block;
+}
+
+.form-row {
+    margin-bottom: 15px;
+}
+
+.botmargin {
+    margin-bottom: 25px;
+}
+
+.canvasResponsive {
+    width: 100%;
+    height: auto;
+}

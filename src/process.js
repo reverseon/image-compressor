@@ -1,9 +1,59 @@
-let img_input = document.getElementById('input_img');
-let file_input = document.getElementById('file_input');
+const userDataForm = document.querySelector('#compressionsettings');
+const comprateinp = document.querySelector('#compRateinp');
+const imageInp = document.querySelector('#imageinp');
+const before_img = document.querySelector('#before_img');
+const isTruePixel = document.querySelector('#isTruePixel');
+const truepx_img = document.querySelector('#truePxImg');
+const downloadbutton = document.querySelector('.dlbtn');
+let aftercanvas = document.querySelector('#after_img');
+aftercanvas.width = 0;
+aftercanvas.height = 0;
+let origwidth = 0;
+let origheight = 0;
 const gpu = new GPU();
-file_input.addEventListener('change', (e) => {
-    img_input.src = URL.createObjectURL(e.target.files[0])
-},false);
+let beforeSrc = '';
+
+function dlCanvas() {
+    let linkdl = document.createElement('a');
+    linkdl.download = 'compressed.png';
+    linkdl.href = aftercanvas.toDataURL('image/png');
+    linkdl.click();
+}
+
+function dlCanvasResized() {
+    let resizedcv = document.createElement('canvas');
+    let resizedctx = resizedcv.getContext('2d');
+    resizedcv.width = origwidth;
+    resizedcv.height = origheight;
+    resizedctx.drawImage(aftercanvas, 0, 0, origwidth, origheight);
+    let linkdl = document.createElement('a');
+    linkdl.download = 'compressed.png';
+    linkdl.href = resizedcv.toDataURL('image/png');
+    linkdl.click();
+}
+
+function genDlButtonTruePixel() {
+    downloadbutton.innerHTML = `
+    <hr/>
+    <button type="button" id="downloadcanvas" class="btn btn-primary float-end">Download</button>
+    `
+}
+
+function genDlButton() {
+    downloadbutton.innerHTML = `
+    <hr/>
+    <button type="button" id="downloadcanvas" class="btn btn-success float-start">Download</button>
+    <button type="button" id="downloadcanvasresized" class="btn btn-primary float-end">Download Resized</button>
+    `;
+}
+
+downloadbutton.addEventListener('click', function(e) {
+    if (e.target.id == 'downloadcanvas') {
+        dlCanvas();
+    } else if (e.target.id == 'downloadcanvasresized') {
+        dlCanvasResized();
+    }
+});
 
 function multiplyMatrix(ma, mb) {
     let brow = mb.length;
@@ -69,13 +119,13 @@ function compressChannel(channelArr, percent) {
         }
         modifiedQ.push(rowNow);
     }
-    let vTranspose = math.transpose(math.matrix(v))._data;
+    let vTranspose = math.transpose(v);
     let modifiedVT = vTranspose.slice(0, level);
     let modifiedU = u.map(i => i.slice(0, level));
     let leftMatrix = multiplyMatrix(modifiedQ, modifiedVT);
     let finalArr = multiplyMatrix(modifiedU, leftMatrix).map(i => i.map(j => {
-        if (j == NaN) {
-            return 0;
+        if (j == NaN || j == Infinity) {
+            return 255;
         } else if (j > 255) {
             return 255;
         } else if (j < 0) {
@@ -85,62 +135,55 @@ function compressChannel(channelArr, percent) {
         }
     }
     ));
-    // let finalArr = math.multiply(math.matrix(u), math.multiply(math.matrix(modifiedQ), math.matrix(vTranspose)))._data;
     return finalArr;
 }
-// PROSES KOMPRESI GAMBAR
-img_input.onload = function() {
-    let src = cv.imread(img_input);
-    let dst = new cv.Mat();
-    let rgbaSrc = new cv.MatVector();
-    let rgbaDst = new cv.MatVector();
-    let zeroArr = [];
-    for (let i = 0; i < src.rows; i++) {
-        let rowNow = [];
-        for (let j = 0; j < src.cols; j++) {
-            rowNow.push(0);
+
+imageInp.addEventListener('change', (e) => {
+    beforeSrc = URL.createObjectURL(e.target.files[0])
+},false);
+
+userDataForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    before_img.src = beforeSrc;
+    before_img.cprate = comprateinp.value;
+    if (isTruePixel.checked) {
+        truepx_img.cprate = comprateinp.value;
+        truepx_img.src = beforeSrc;
+    }
+}); 
+
+before_img.onload = function() {
+    origwidth = this.naturalWidth;
+    origheight = this.naturalHeight;
+    if (!isTruePixel.checked) {
+        let src = cv.imread(before_img);
+        let dst = new cv.Mat();
+        let rgbaSrc = new cv.MatVector();
+        let rgbaDst = new cv.MatVector();
+        cv.split(src, rgbaSrc);
+        for (let i = 0; i < 3; i++) {
+            rgbaDst.push_back(arrToMat(compressChannel(matToArr(rgbaSrc.get(i)), before_img.cprate)));
         }
-        zeroArr.push(rowNow);
+        rgbaDst.push_back(rgbaSrc.get(3))
+        cv.merge(rgbaDst, dst);
+        cv.imshow('after_img', dst);
+        genDlButton();
     }
-    let zeroMat = arrToMat(zeroArr);
-    cv.split(src, rgbaSrc);
-    for (let i = 0; i < 3; i++) {
-        rgbaDst.push_back(arrToMat(compressChannel(matToArr(rgbaSrc.get(i)), 100)));
-        //console.log(matToArr(rgbaSrc.get(i)));
-        //console.log(matToArr(rgbaDst.get(i)));
-        // rgbaDst.push_back(rgbaSrc.get(i));
+}
+
+truepx_img.onload = function() {
+    if (isTruePixel.checked) {
+        let src = cv.imread(truepx_img);
+        let dst = new cv.Mat();
+        let rgbaSrc = new cv.MatVector();
+        let rgbaDst = new cv.MatVector();
+        cv.split(src, rgbaSrc);
+        for (let i = 0; i < 3; i++) {
+            rgbaDst.push_back(arrToMat(compressChannel(matToArr(rgbaSrc.get(i)), truepx_img.cprate)));
+        }
+        rgbaDst.push_back(rgbaSrc.get(3))
+        cv.merge(rgbaDst, dst);
+        cv.imshow('after_img', dst);
+        genDlButtonTruePixel();
     }
-    // console.log(rgbaSrc.get(0));
-    // console.log(rgbaSrc.get(1));
-    // console.log(rgbaSrc.get(2));
-    // rgbaDst.push_back(
-    //     arrToMat(compressChannel(matToArr(rgbaSrc.get(0)), 1))
-    // );
-    // rgbaDst.push_back(zeroMat);
-    // rgbaDst.push_back(zeroMat);
-    // rgbaDst.push_back(rgbaSrc.get(3));
-    // console.log(matToArr(rgbaDst.get(0)));
-    // let RMat = rgbaSrc.get(0);
-    // let GMat = rgbaSrc.get(1);
-    // let BMat = rgbaSrc.get(2);
-    // let RArr = matToArr(RMat);
-    // let GArr = matToArr(GMat);
-    // let BArr = matToArr(BMat);
-    // // let AArr = matToArr(AMat);
-    // let complevel = 150
-    // let RArrComp = compressChannel(RArr, complevel);
-    // let GArrComp = compressChannel(GArr, complevel);
-    // let BArrComp = compressChannel(BArr, complevel);
-    // // let AArrComp = compressChannel(AArr, complevel);
-    // let RMatSec = arrToMat(RArrComp);
-    // let GMatSec = arrToMat(GArrComp);
-    // let BMatSec = arrToMat(BArrComp);
-    // // let AMatSec = arrToMat(AArrComp);
-    // rgbaDst.push_back(RMatSec);
-    // rgbaDst.push_back(GMatSec);
-    // rgbaDst.push_back(BMatSec);
-    // rgbaDst.push_back(AMatSec);
-    cv.merge(rgbaDst, dst);
-    cv.imshow('output', dst);
-    src.delete();
 }

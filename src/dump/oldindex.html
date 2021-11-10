@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>IMG CMP</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+        <div class="feedback">
+
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.5.1/math.js"></script>
+        <script src="https://unpkg.com/gauss-jordan@1.2.2/dist/gauss-jordan.min.js"></script>
+        <script src="https://docs.opencv.org/4.5.4/opencv.js"></script>
+        <div>
+            <img id='input_img'>
+            <input type="file" id="file_input" name="file">
+        </div>
+        <div class="output">
+            <canvas id='output'></canvas>
+        </div>
+        <script src="https://unpkg.com/gpu.js@latest/dist/gpu-browser.min.js"></script>
+        <script src="svdoptimized.js"></script>
+        <script src="process.js"></script>
+    </body>
+</html>

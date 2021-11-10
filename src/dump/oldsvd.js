@@ -84,7 +84,7 @@ function qrdecompose(m1) {
 function eigennoshift(m, step) {
     let a = math.clone(m)
     for (let i = 0; i < step; i++) {
-        let qr = qrdecompose(a);
+        let qr = math.qr(a);
         let prea = a
         a = math.multiply(qr.R, qr.Q)
         if (isMEq(prea, a)) {
@@ -100,13 +100,13 @@ function eigenshift(m, step) {
         shift = math.multiply(a.get([a._size[0]-1, a._size[1]-1]),math.identity(math.size(a)))
         let prea = a
         a = math.subtract(a, shift);
-        qr = qrdecompose(a);
+        qr = math.qr(a);
         q = qr.Q
         r = qr.R
         a = math.add(math.multiply(r, q),  shift);
-        if (i < 5) { // arbitrary
+        if (i < 3) { // arbitrary
             if (isMEq(prea, a)) {
-                a = eigennoshift(m, 5000);
+                a = eigennoshift(m, 5);
                 break;
             }
         }
@@ -190,7 +190,7 @@ function isExistinArray(a, v) {
 
 function getEigenPair(m) {
     let aoEP = [] // ARRAY OF EIGENPAIR
-    let egvalm = eigenshift(m, 10000)
+    let egvalm = eigenshift(m, 5)
     let egval = math.zeros(egvalm._size[0])
     for (let i = 0; i < egvalm._size[0]; i++) {
         egval.set([i], egvalm.get([i,i]))
@@ -279,13 +279,6 @@ function getSVD(m) {
     }
     return theSVD;
 }
-
-let fedb = document.querySelector(".feedback")
-let m = math.matrix([[3, 1, 1], [-1, 3,1]])
-let svdb = getSVD(m)
-console.log(m)
-console.log(svdb)
-console.log(math.multiply(svdb.u, math.multiply(svdb.sigma, svdb.vt)))
 
 // console.log(mt)
 // let mta = reducedREF(mt)
