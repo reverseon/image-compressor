@@ -12,6 +12,7 @@ let origwidth = 0;
 let origheight = 0;
 const gpu = new GPU();
 let beforeSrc = '';
+prevSvdMatrices = [];
 
 function dlCanvas() {
     let linkdl = document.createElement('a');
@@ -90,20 +91,26 @@ function matToArr(mat) {
     return arr;
 }
 
-function compressChannel(channelArr, percent) {
+function compressChannel(channelArr, percent, i) {
     if (percent < 1 || percent > 100) {
         throw new Error('Percent must be between 1 and 100');
     }
-    let {u, v, q} = svdgolub(channelArr);
-    let modifiedQ = [];
-    let cols = channelArr[0].length;
-    let rows = channelArr.length;
-    let level = 0;
-    if (cols > rows) {
-        level = Math.round(rows * percent / 100);
-    } else {
-        level = Math.round(cols * percent / 100);
+    if(prevSvdMatrices.length < i+1){
+        let svd = svdgolub(channelArr);
+        prevSvdMatrices.push(svd);
+        return multiplySvdToMat(svd, percent);
+    } else{
+        return multiplySvdToMat(prevSvdMatrices[i], percent);
     }
+}
+
+function multiplySvdToMat(svd, percent){
+    let modifiedQ = [];
+    let {u, q, v} = svd;
+    let cols = svd.u.length;
+    let rows = svd.v.length;
+    let level = rows < cols ? Math.round(rows * percent / 100) : Math.round(cols * percent / 100);
+
     for (let i = 0; i < level; i++) {
         let rowNow = [];
         for (let j = 0; j < level; j++) {
@@ -139,7 +146,8 @@ function compressChannel(channelArr, percent) {
 }
 
 imageInp.addEventListener('change', (e) => {
-    beforeSrc = URL.createObjectURL(e.target.files[0])
+    beforeSrc = URL.createObjectURL(e.target.files[0]);
+    prevSvdMatrices = [];
 },false);
 
 userDataForm.addEventListener('submit', function(e) {
@@ -162,11 +170,13 @@ before_img.onload = function() {
         let rgbaDst = new cv.MatVector();
         cv.split(src, rgbaSrc);
         for (let i = 0; i < 3; i++) {
-            rgbaDst.push_back(arrToMat(compressChannel(matToArr(rgbaSrc.get(i)), before_img.cprate)));
+            rgbaDst.push_back(arrToMat(compressChannel(matToArr(rgbaSrc.get(i)), before_img.cprate, i)));
         }
         rgbaDst.push_back(rgbaSrc.get(3))
         cv.merge(rgbaDst, dst);
         cv.imshow('after_img', dst);
+        src.delete();
+        dst.delete();
         genDlButton();
     }
 }
@@ -179,11 +189,13 @@ truepx_img.onload = function() {
         let rgbaDst = new cv.MatVector();
         cv.split(src, rgbaSrc);
         for (let i = 0; i < 3; i++) {
-            rgbaDst.push_back(arrToMat(compressChannel(matToArr(rgbaSrc.get(i)), truepx_img.cprate)));
+            rgbaDst.push_back(arrToMat(compressChannel(matToArr(rgbaSrc.get(i)), truepx_img.cprate, i)));
         }
         rgbaDst.push_back(rgbaSrc.get(3))
         cv.merge(rgbaDst, dst);
         cv.imshow('after_img', dst);
+        src.delete();
+        dst.delete();
         genDlButtonTruePixel();
     }
 }

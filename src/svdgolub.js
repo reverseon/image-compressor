@@ -253,11 +253,11 @@ function svdgolub(m1) {
             Q[i] = 0;
     }
     let t6 = performance.now();
-    console.log("Segmen 1 " + (t2-t1));
-    console.log("Segmen 2 " + (t3-t2));
-    console.log("Segmen 3 " + (t4-t3));
-    console.log("Segmen 4 " + (t5-t4));
-    console.log("Segmen 5 " + (t6-t5));
+    //console.log("Segmen 1 " + (t2-t1));
+    //console.log("Segmen 2 " + (t3-t2));
+    //console.log("Segmen 3 " + (t4-t3));
+    //console.log("Segmen 4 " + (t5-t4));
+    //console.log("Segmen 5 " + (t6-t5));
     if(istransposed){
         return {u: V, q: Q, v: U};
     } else{
