@@ -3,7 +3,6 @@
               https://doi.org/10.1007/BF02163027
               Tambahan: http://statistics.uchicago.edu/~lekheng/courses/324/chan.pdf */
 function svdgolub(m1) {
-    let t1 = performance.now();
     withu = true;
     withv = true;
     let m = m1.length;
@@ -27,10 +26,10 @@ function svdgolub(m1) {
 
     let i, j, k, l, l1;
     let c, f, g, h, s, x, y, z;
+
     // Reduksi Householder ke bentuk bidiagonal
     g = 0;
     x = 0;
-    let t2 = performance.now();
     for (i = 0; i < n; i++) {
         e[i] = g;
         s = 0;
@@ -85,7 +84,7 @@ function svdgolub(m1) {
         y = Math.abs(Q[i]) + Math.abs(e[i]);
         if (y > x) x = y;
     }
-    let t3 = performance.now();
+
     // Accumulation of right-hand transformations
     if (withv) {
         for (i = n - 1; i >= 0; i--) {
@@ -104,7 +103,7 @@ function svdgolub(m1) {
             l = i;
         }
     }
-    let t4 = performance.now();
+
     // Accumulation of left-hand transformations
     if (withu) {
         for (i = n; i < m; i++) {
@@ -130,7 +129,7 @@ function svdgolub(m1) {
             U[i][i] = U[i][i] + 1;
         }
     }
-    let t5 = performance.now();
+    
     // Diagonalization of the bidiagonal form
     eps = eps * x;
     k = n - 1;
@@ -240,7 +239,7 @@ function svdgolub(m1) {
             e[l] = 0;
             e[k] = f;
             Q[k] = x;
-            // GOTO test f splitting
+            // GOTO test f splitting (loop)
             counter++;
             if(counter == 5){
                 k--;
@@ -252,12 +251,7 @@ function svdgolub(m1) {
         if(Q[i] < eps)
             Q[i] = 0;
     }
-    let t6 = performance.now();
-    //console.log("Segmen 1 " + (t2-t1));
-    //console.log("Segmen 2 " + (t3-t2));
-    //console.log("Segmen 3 " + (t4-t3));
-    //console.log("Segmen 4 " + (t5-t4));
-    //console.log("Segmen 5 " + (t6-t5));
+    
     if(istransposed){
         return {u: V, q: Q, v: U};
     } else{
