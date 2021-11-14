@@ -6,6 +6,7 @@ const isTruePixel = document.querySelector('#isTruePixel');
 const truepx_img = document.querySelector('#truePxImg');
 const downloadbutton = document.querySelector('.dlbtn');
 const perfstats = document.querySelector('.perfstats');
+let percentPixel;
 let filename;
 let filetype;
 let startTime;
@@ -64,9 +65,9 @@ function genDlButton() {
 function displayPerfStats() {
     perfstats.innerHTML = `
     <hr/>
-    <p class="card-text" style="margin-bottom: 5px !important;"><small class="text-muted" id="performancetimestats">Time: ${Math.round((Math.round(endTime - startTime) / 1000) * 100)/100}s</small>
+    <p class="card-text" style="margin-bottom: 5px !important;"><small class="text-muted" id="performancetimestats">Time: ${Math.round((endTime - startTime) / 10)/100}s</small>
     </p>
-    <p class="card-text"><small class="text-muted" id="compratestats">Compression Rate: ${101 - comprateinp.value}%</small></p>
+    <p class="card-text"><small class="text-muted" id="compratestats">Pixel Percentage: ${Math.round(percentPixel*100)/100}%</small></p>
     `
 }
 
@@ -140,6 +141,7 @@ function multiplySvdToMat(svd, percent){
         }
     }
     let level = rows < cols ? Math.round((rows - zeroatfirst) * percent / 100) : Math.round((cols - zeroatfirst) * percent / 100);
+    percentPixel = ((cols*level + level + level*rows)/(cols*rows))*100;
     level = level + zeroatfirst;
     for (let i = 0; i < level; i++) {
         let rowNow = [];

@@ -1,3 +1,19 @@
+html, body {
+    height: 100%;
+    overflow: auto;
+}
+.flexhere {
+    min-height: 100%;
+    display:flex;
+    flex-flow: column nowrap;
+    flex: 1 1 auto;
+}
+.cover {
+    flex: 1 1 auto;
+    background: url(background.png) no-repeat; 
+    background-size: 100% 100%;
+    
+}
 .card-body {
     width: 100%;
     display: inline-block;
@@ -10,8 +26,33 @@
 .botmargin {
     margin-bottom: 25px;
 }
+.card{
+    border-radius: 10px;
+}
 
 .canvasResponsive {
     width: 100%;
     height: auto;
+}
+
+h1 {
+    font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    font-weight: 700;
+    text-shadow: 2px 2px 5px #000000;
+}
+.masthead-heading {
+    color: white;
+    font-size: 3rem;
+    line-height: 3.5rem;
+}
+.footer {
+    left: 0;
+    bottom: 0;
+    width: 100%;
+}
+
+@media screen and (max-width: 1680px) {
+    .cover {
+        background-size: cover;
+    }
 }
